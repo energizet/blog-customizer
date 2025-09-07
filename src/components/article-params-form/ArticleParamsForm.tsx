@@ -5,8 +5,9 @@ import styles from './ArticleParamsForm.module.scss';
 import clsx from 'clsx';
 import { OnClick } from 'src/ui/arrow-button/ArrowButton';
 import { Select } from 'src/ui/select';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+	ArticleStateType,
 	backgroundColors,
 	contentWidthArr,
 	defaultArticleState,
@@ -21,23 +22,29 @@ import { Text } from 'src/ui/text';
 interface ArticleParamsFormProps {
 	isOpen: boolean;
 	toggleOpen: OnClick;
+	fontStyles: ArticleStateType;
+	setFontStyles: (styles: ArticleStateType) => void;
 }
 
 export const ArticleParamsForm = ({
 	isOpen,
 	toggleOpen,
+	fontStyles,
+	setFontStyles,
 }: ArticleParamsFormProps) => {
-	const [fontFamily, setFontFamily] = useState(
-		defaultArticleState.fontFamilyOption
-	);
-	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
-	const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
+	const [fontFamily, setFontFamily] = useState(fontStyles.fontFamilyOption);
+	const [fontSize, setFontSize] = useState(fontStyles.fontSizeOption);
+	const [fontColor, setFontColor] = useState(fontStyles.fontColor);
 	const [backgroundColor, setBackgroundColor] = useState(
-		defaultArticleState.backgroundColor
+		fontStyles.backgroundColor
 	);
-	const [contentWidth, setContentWidth] = useState(
-		defaultArticleState.contentWidth
-	);
+	const [contentWidth, setContentWidth] = useState(fontStyles.contentWidth);
+	const [isReset, setIsReset] = useState(false);
+
+	useEffect(() => {
+		apply();
+		setIsReset(false);
+	}, [isReset]);
 
 	const reset = () => {
 		setFontFamily(defaultArticleState.fontFamilyOption);
@@ -45,10 +52,18 @@ export const ArticleParamsForm = ({
 		setFontColor(defaultArticleState.fontColor);
 		setBackgroundColor(defaultArticleState.backgroundColor);
 		setContentWidth(defaultArticleState.contentWidth);
-		apply();
+		setIsReset(true);
 	};
 
-	const apply = () => {};
+	const apply = () => {
+		setFontStyles({
+			fontFamilyOption: fontFamily,
+			fontColor: fontColor,
+			backgroundColor: backgroundColor,
+			contentWidth: contentWidth,
+			fontSizeOption: fontSize,
+		} as ArticleStateType);
+	};
 
 	return (
 		<>
@@ -56,7 +71,12 @@ export const ArticleParamsForm = ({
 			<aside
 				onClick={(e) => e.stopPropagation()}
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
-				<form className={styles.form}>
+				<form
+					className={styles.form}
+					onSubmit={(e) => {
+						e.preventDefault();
+						apply();
+					}}>
 					<Text size={22} weight={800} uppercase>
 						Задайте параметры
 					</Text>
@@ -99,12 +119,7 @@ export const ArticleParamsForm = ({
 							type='clear'
 							onClick={reset}
 						/>
-						<Button
-							title='Применить'
-							htmlType='submit'
-							type='apply'
-							onClick={apply}
-						/>
+						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>
 			</aside>

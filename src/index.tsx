@@ -14,6 +14,13 @@ const root = createRoot(domNode);
 
 const App = () => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [fontStyles, setFontStyles] = useState({
+		fontFamilyOption: defaultArticleState.fontFamilyOption,
+		fontColor: defaultArticleState.fontColor,
+		backgroundColor: defaultArticleState.backgroundColor,
+		contentWidth: defaultArticleState.contentWidth,
+		fontSizeOption: defaultArticleState.fontSizeOption,
+	});
 
 	return (
 		<main
@@ -21,11 +28,11 @@ const App = () => {
 			className={clsx(styles.main)}
 			style={
 				{
-					'--font-family': defaultArticleState.fontFamilyOption.value,
-					'--font-size': defaultArticleState.fontSizeOption.value,
-					'--font-color': defaultArticleState.fontColor.value,
-					'--container-width': defaultArticleState.contentWidth.value,
-					'--bg-color': defaultArticleState.backgroundColor.value,
+					'--font-family': fontStyles.fontFamilyOption.value,
+					'--font-size': fontStyles.fontSizeOption.value,
+					'--font-color': fontStyles.fontColor.value,
+					'--container-width': fontStyles.contentWidth.value,
+					'--bg-color': fontStyles.backgroundColor.value,
 				} as CSSProperties
 			}>
 			<ArticleParamsForm
@@ -33,6 +40,8 @@ const App = () => {
 				toggleOpen={() => {
 					setIsOpen((prevState) => !prevState);
 				}}
+				fontStyles={fontStyles}
+				setFontStyles={setFontStyles}
 			/>
 			<Article />
 		</main>
