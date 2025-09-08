@@ -3,9 +3,8 @@ import { Button } from 'src/ui/button';
 
 import styles from './ArticleParamsForm.module.scss';
 import clsx from 'clsx';
-import { OnClick } from 'src/ui/arrow-button/ArrowButton';
 import { Select } from 'src/ui/select';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
 	ArticleStateType,
 	backgroundColors,
@@ -18,20 +17,20 @@ import {
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 import { Text } from 'src/ui/text';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 
 interface ArticleParamsFormProps {
-	isOpen: boolean;
-	toggleOpen: OnClick;
 	fontStyles: ArticleStateType;
 	setFontStyles: (styles: ArticleStateType) => void;
 }
 
 export const ArticleParamsForm = ({
-	isOpen,
-	toggleOpen,
 	fontStyles,
 	setFontStyles,
 }: ArticleParamsFormProps) => {
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const rootRef = useRef<HTMLDivElement>(null);
+
 	const [fontFamily, setFontFamily] = useState(fontStyles.fontFamilyOption);
 	const [fontSize, setFontSize] = useState(fontStyles.fontSizeOption);
 	const [fontColor, setFontColor] = useState(fontStyles.fontColor);
@@ -40,6 +39,12 @@ export const ArticleParamsForm = ({
 	);
 	const [contentWidth, setContentWidth] = useState(fontStyles.contentWidth);
 	const [isReset, setIsReset] = useState(false);
+
+	useOutsideClickClose({
+		isOpen: isMenuOpen,
+		rootRef,
+		onChange: setIsMenuOpen,
+	});
 
 	useEffect(() => {
 		apply();
@@ -67,10 +72,16 @@ export const ArticleParamsForm = ({
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={toggleOpen} />
+			<ArrowButton
+				isOpen={isMenuOpen}
+				onClick={() => setIsMenuOpen((prevState) => !prevState)}
+			/>
 			<aside
+				ref={rootRef}
 				onClick={(e) => e.stopPropagation()}
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+				className={clsx(styles.container, {
+					[styles.container_open]: isMenuOpen,
+				})}>
 				<form
 					className={styles.form}
 					onSubmit={(e) => {
